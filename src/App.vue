@@ -3,10 +3,19 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
-onMounted(() => {
+import { onMounted, provide, ref } from "vue";
+import { getSurplus } from "@/api/surplus.js";
+const surplusText = ref("");
+onMounted(async () => {
   document.body.removeChild(document.getElementById("loading"));
+  document.addEventListener("llmEnd", async () => {
+    surplusText.value = await getSurplus();
+  });
+  if (localStorage.getItem("qaiKey")) {
+    surplusText.value = await getSurplus();
+  }
 });
+provide("surplusText", surplusText);
 </script>
 <style lang="less">
 .warp-sm {
@@ -121,7 +130,8 @@ html {
 }
 .message {
   img,
-  * {
+  pre,
+  code {
     max-width: 100%;
     overflow-y: auto;
   }
@@ -132,7 +142,6 @@ html {
 }
 .message pre {
   position: relative;
-  max-width: calc(var(--v-warp-widht) - 32px - 1rem);
   overflow: auto;
   background: rgba(var(--v-theme-on-code), 0.8);
   color: rgb(var(--v-theme-code));
@@ -143,15 +152,14 @@ html {
     position: absolute;
     content: "复制";
     background: rgba(var(--v-theme-on-code), 0.8);
-    top: 0rem;
-    right: 0rem;
+    top: 0;
+    right: 0;
     padding: 0.3rem 1rem;
     border-top-right-radius: 0.5rem;
     border-bottom-left-radius: 0.5rem;
     pointer-events: all;
   }
   code {
-    max-width: calc(var(--v-warp-widht) - 32px - 1rem);
     .generating {
       display: none;
     }
