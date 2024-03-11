@@ -1,123 +1,138 @@
 <template>
-  <div class="warp">
-    <div class="d-flex align-center">
-      <h2 class="my-5" v-text="name"></h2>
-
-      <v-tooltip text="新建收藏" location="bottom">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            v-bind="props"
-            icon="mdi-star-outline"
-            variant="text"
-            size="small"
-            :to="'/prompts/setup?prompt=' + prompt + '&name=' + name"
-            class="mx-3"
-          ></v-btn>
-        </template>
-      </v-tooltip>
-      <v-tooltip text="分享" location="bottom">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            v-bind="props"
-            icon="mdi-share-outline"
-            variant="text"
-            size="small"
-            @click="share"
-          ></v-btn>
-        </template>
-      </v-tooltip>
-    </div>
-    <template v-for="item in d.components">
-      <v-text-field
-        :key="item.name + 'input'"
-        v-if="item.type == 'input'"
-        :label="item.name"
-        v-model="d.data[item.name]"
-      ></v-text-field>
-      <v-textarea
-        :key="item.name + 'textarea'"
-        v-else-if="item.type == 'textarea'"
-        :label="item.name"
-        v-model="d.data[item.name]"
-      ></v-textarea>
-      <v-text-field
-        :key="item.name + 'number'"
-        v-else-if="item.type == 'number'"
-        :label="item.name"
-        type="number"
-        v-model="d.data[item.name]"
-      ></v-text-field>
-      <v-select
-        :key="item.name + 'select'"
-        v-else-if="item.type == 'select'"
-        :label="item.name"
-        :items="item.value"
-        v-model="d.data[item.name]"
-      ></v-select>
-      <v-radio-group
-        :key="item.name + 'radio'"
-        v-else-if="item.type == 'radio'"
-        :label="item.name"
-        v-model="d.data[item.name]"
-      >
-        <v-radio
-          v-for="v in item.value"
-          :key="v"
-          :label="v"
-          :value="v"
-        ></v-radio>
-      </v-radio-group>
-      <component v-else :key="item.name + 'comp'" :is="item.type">{{
-        item.value
-      }}</component>
-    </template>
-
-    <v-btn
-      block
-      :icon="generating ? 'mdi-stop-circle-outline' : 'mdi-send-outline'"
-      rounded="lg"
-      :disabled="!d.hasAllValue"
-      color="primary"
-      @click="clickBtn"
-    >
-    </v-btn>
-    <div class="message my-5" v-if="res">
-      <div
-        v-html="
-          micromark(
-            res.content + (generating ? '<span class=generating></span>' : '')
-          )
-        "
-      ></div>
-      <div class="actions-warp mt-3" v-if="!generating">
-        <v-tooltip text="复制" location="bottom">
-          <template v-slot:activator="{ props }">
-            <v-btn
-              v-bind="props"
-              icon="mdi-content-copy"
-              variant="text"
-              size="small"
-              @click="copy(micromark(res.content).replace(/<[^>]*>/g, ''))"
-            ></v-btn>
-          </template>
-        </v-tooltip>
-        <v-tooltip text="开始对话" location="bottom">
-          <template v-slot:activator="{ props }">
-            <v-btn
-              v-bind="props"
-              icon="mdi-message-outline"
-              variant="text"
-              size="small"
-              @click="goChat"
-            ></v-btn>
-          </template>
-        </v-tooltip>
+  <div class="pa-5" :class="mobile ? 'grid-sm pl-5 ' : 'grid pl-9 '">
+    <div class="message">
+      <div class="d-flex align-center justify-space-between mb-3">
+        <div class="d-flex align-center">
+          <v-avatar color="primary" size="small" class="mr-2">
+            {{ name.substring(0, 1) }}
+          </v-avatar>
+          <h5 v-text="name"></h5>
+        </div>
+        <div>
+          <v-tooltip text="新建收藏" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon="mdi-star-outline"
+                variant="text"
+                size="small"
+                :to="'/prompts/setup?prompt=' + prompt + '&name=' + name"
+                class="mx-3"
+              ></v-btn>
+            </template>
+          </v-tooltip>
+          <v-tooltip text="分享" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon="mdi-share-outline"
+                variant="text"
+                size="small"
+                @click="share"
+              ></v-btn>
+            </template>
+          </v-tooltip>
+        </div>
       </div>
+      <template v-for="item in d.components">
+        <v-text-field
+          :key="item.name + 'input'"
+          v-if="item.type == 'input'"
+          :label="item.name"
+          v-model="d.data[item.name]"
+        ></v-text-field>
+        <v-textarea
+          :key="item.name + 'textarea'"
+          v-else-if="item.type == 'textarea'"
+          :label="item.name"
+          v-model="d.data[item.name]"
+        ></v-textarea>
+        <v-text-field
+          :key="item.name + 'number'"
+          v-else-if="item.type == 'number'"
+          :label="item.name"
+          type="number"
+          v-model="d.data[item.name]"
+        ></v-text-field>
+        <v-select
+          :key="item.name + 'select'"
+          v-else-if="item.type == 'select'"
+          :label="item.name"
+          :items="item.value"
+          v-model="d.data[item.name]"
+        ></v-select>
+        <v-radio-group
+          :key="item.name + 'radio'"
+          v-else-if="item.type == 'radio'"
+          :label="item.name"
+          v-model="d.data[item.name]"
+        >
+          <v-radio
+            v-for="v in item.value"
+            :key="v"
+            :label="v"
+            :value="v"
+          ></v-radio>
+        </v-radio-group>
+        <component v-else :key="item.name + 'comp'" :is="item.type">{{
+          item.value
+        }}</component>
+      </template>
+
+      <v-btn
+        block
+        :icon="generating ? 'mdi-stop-circle-outline' : 'mdi-send-outline'"
+        rounded="lg"
+        :disabled="!d.hasAllValue"
+        color="primary"
+        @click="clickBtn"
+      >
+      </v-btn>
+    </div>
+    <div class="message">
+      <h5 for=""><v-icon>mdi-magic-staff</v-icon>生成文案</h5>
+      <template v-if="res">
+        <div class="message-warp pa-5 mt-3">
+          <div
+            v-html="
+              micromark(
+                res.content +
+                  (generating ? '<span class=generating></span>' : '')
+              )
+            "
+          ></div>
+        </div>
+        <div class="actions-warp mt-3" v-if="!generating">
+          <v-tooltip text="复制" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon="mdi-content-copy"
+                variant="text"
+                size="small"
+                @click="copy(micromark(res.content).replace(/<[^>]*>/g, ''))"
+              ></v-btn>
+            </template>
+          </v-tooltip>
+          <v-tooltip text="开始对话" location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon="mdi-message-outline"
+                variant="text"
+                size="small"
+                @click="goChat"
+              ></v-btn>
+            </template>
+          </v-tooltip>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 <script setup>
 import { ref, nextTick, computed, watch } from "vue";
+import { useDisplay } from "vuetify";
 import { useInter } from "@/compose/promptInter";
 import { llm } from "@/service/llmAdapter";
 import { copy as copy0 } from "@/utils/copySupport";
@@ -131,6 +146,7 @@ const router = useRouter();
 const d = useInter(props);
 const generating = ref(false);
 const cloneData = ref([]);
+const { mobile } = useDisplay();
 const res = computed(() =>
   cloneData.value.length > 1 ? cloneData.value[1] : ""
 );
@@ -299,10 +315,11 @@ function copy(text) {
 </script>
 <style lang="less" scoped>
 .message {
-  background: rgba(var(--v-theme-code), 0.5);
+  background: rgb(255, 255, 255);
   padding: 1rem;
   border-radius: 1rem;
   border: 1px solid rgb(var(--v-theme-code));
+  min-height: calc(100vh - 2.5rem);
   .actions-warp {
     .v-btn--icon.v-btn--density-default {
       width: calc(var(--v-btn-height));
@@ -312,5 +329,31 @@ function copy(text) {
       margin: 0 0.5rem;
     }
   }
+}
+.grid-sm {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 1rem;
+  .message {
+    min-height: 0;
+  }
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-gap: 1rem;
+}
+.message-warp {
+  background: #f9f9f9;
+  border-radius: 0.5rem;
+}
+</style>
+<style>
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 20px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-on-background), 0.3);
 }
 </style>
