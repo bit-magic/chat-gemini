@@ -27,7 +27,6 @@
         :key="item.id"
         :data-id="item.id"
         :to="'/chats/' + item.id"
-        :subtitle="formatData(item.time)"
       >
         <template #append>
           <div class="actions">
@@ -89,7 +88,7 @@ async function createChat() {
 
 async function delChat0(id) {
   await delChat(id);
-  if (!mobile.value) {
+  if (!mobile.value && route.params.id == id) {
     newChat0();
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="mx-3 my-2">
     <div class="d-flex flex header">
-      <v-list-subheader>发现 </v-list-subheader>
+      <v-list-subheader>创作 </v-list-subheader>
       <!-- <v-btn
         prepend-icon=" mdi-github"
         size="small"
@@ -27,11 +27,11 @@
     />
   </div>
   <v-list nav>
+    <v-list-item title="全部" to="/app/all"> </v-list-item>
     <v-list-item
       v-for="item in d"
       :title="item.name"
       :value="item.name"
-      :subtitle="item.desc"
       :key="item.key"
       :to="'/app/' + item.key"
     >
@@ -46,14 +46,16 @@
 <script setup>
 import { discoverList } from "@/api/discover";
 import { computed, nextTick, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 import { useDisplay } from "vuetify";
 const data = ref([]);
 const value = ref("");
 const { mobile } = useDisplay();
+const route = useRoute();
 onMounted(async () => {
   data.value = await discoverList();
   nextTick(() => {
-    if (!mobile.value) {
+    if (!mobile.value && route.path == "/app") {
       document
         .querySelector(".v-navigation-drawer:last-of-type .v-list-item")
         .click();

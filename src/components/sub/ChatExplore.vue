@@ -26,7 +26,7 @@
           <small>{{ item.desc }}</small>
         </div>
         <div class="icon">
-          <v-icon>mdi-pencil-outline</v-icon>
+          <v-icon>mdi-fountain-pen-tip</v-icon>
         </div>
       </div>
     </div>
@@ -55,11 +55,11 @@ const emit = defineEmits(["update:modelValue", "click"]);
   }
 }
 .explore-warp {
-  position: absolute;
+  position: sticky;
+  margin-top: 30vh;
   bottom: 0;
   padding-bottom: 1rem;
   animation: up 3s;
-  max-width: calc(var(--v-warp-widht) - 2rem);
   background-color: rgb(var(--v-theme-background));
   z-index: 10;
 }
