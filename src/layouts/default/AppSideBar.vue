@@ -34,7 +34,7 @@
   <template v-else>
     <v-navigation-drawer class="drawer" width="130">
       <!-- <v-list nav> -->
-      <div class="mx-auto text-center my-3">
+      <div v-if="domain.includes('lo')" class="mx-auto text-center my-3">
         <v-avatar size="large" image="/logo.png" loading></v-avatar>
         <h5 class="mt-3">极速AI</h5>
       </div>
@@ -55,18 +55,19 @@
       <div class="bar-footer">
         <v-divider></v-divider>
 
-        <v-list density="compact" nav>
-          <div class="d-flex justify-space-between align-center mb-1 mt-2">
-            <p class="font-sm" v-text="surplusText"></p>
+        <v-list nav>
+          <div class="text-center align-center my-1">
             <v-dialog max-width="500">
               <template v-slot:activator="{ props: activatorProps }">
-                <v-btn
-                  color="primary"
-                  size="small"
+                <div
                   v-bind="activatorProps"
-                  text="充值"
-                  variant="text"
-                ></v-btn>
+                  class="d-flex justify-space-between align-center"
+                >
+                  <p class="font-sm" v-text="surplusText"></p>
+                  <v-btn size="small" variant="text" color="primary"
+                    >充值</v-btn
+                  >
+                </div>
               </template>
 
               <template v-slot:default>
@@ -113,12 +114,14 @@ const value = ref("");
 const bars = [
   { icon: "mdi-message-outline", name: "对话", value: "/chats" },
 
-  { icon: "mdi-pencil-box-outline", name: "创作", value: "/app" },
+  { icon: "mdi-pencil-box-outline ", name: "创作", value: "/app" },
 
   { icon: "mdi-star-outline", name: "收藏", value: "/prompts" },
 ];
 
 const surplusText = inject("surplusText");
+
+const domain = window.location.host;
 
 function quickEnter() {
   const text = value.value;
